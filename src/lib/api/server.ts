@@ -16,6 +16,7 @@ const {
   TMDB_READ_ACCESS_TOKEN,
   TMDB_API_BASE_URL,
   API_BASE_URL,
+  API_BASE_PATH,
   DATA_AGENT,
   USER_AGENT,
 } = process.env;
@@ -40,6 +41,7 @@ export async function serverFetch<T>({
   const defaultHeaders: HeadersInit = {
     "User-Agent": USER_AGENT,
     "Data-Agent": DATA_AGENT,
+    "Content-Type": "application/x-www-form-urlencoded",
   };
 
   const fetchOpts: RequestInit = {
@@ -102,12 +104,9 @@ export async function getAllDrama(request: MovieListRequest) {
   const params = buildParams<MovieListRequest>(request);
 
   const response = await serverFetch<MovieListResponse>({
-    path: "/drakor/phalcon/api/get_category_all/v2/",
+    path: `${API_BASE_PATH}/get_category_all/v2/`,
     opts: {
       method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
       body: params.toString(),
       next: { revalidate: TIME.ONE_DAY, tags: ["allDrama"] }, // default to 60 seconds}
     },
@@ -125,12 +124,9 @@ export async function getNewPostsDrama(request: MovieListRequest) {
   const params = buildParams<MovieListRequest>(request);
 
   const response = await serverFetch<MovieListResponse>({
-    path: "/drakor/phalcon/api/get_new_posts_drakor/v2/",
+    path: `${API_BASE_PATH}/get_new_posts_drakor/v2/`,
     opts: {
       method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
       body: params.toString(),
       next: { revalidate: TIME.ONE_DAY, tags: ["newPostsDrama"] }, // default to 60 seconds}
     },
@@ -149,12 +145,9 @@ export async function getOngoingDrama(request: MovieListRequest) {
   const params = buildParams<MovieListRequest>(request);
 
   const response = await serverFetch<MovieListResponse>({
-    path: "/drakor/phalcon/api/get_category_ongoing_drakor/v2/",
+    path: `${API_BASE_PATH}/get_category_ongoing_drakor/v2/`,
     opts: {
       method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
       body: params.toString(),
       next: { revalidate: TIME.ONE_DAY, tags: ["ongoingDrama"] }, // default to 60 seconds}
     },
@@ -169,12 +162,9 @@ export async function getCategoryPost(
   const params = buildParams<MovieListRequest & { id: string }>(request);
 
   return await serverFetch<CategoryPostResponse>({
-    path: "/drakor/phalcon/api/get_category_posts_drakor/v2/",
+    path: `${API_BASE_PATH}/get_category_posts_drakor/v2/`,
     opts: {
       method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
       body: params.toString(),
       next: { revalidate: TIME.ONE_DAY, tags: ["dramaDetails"] }, // default to 60 seconds}
     },
@@ -197,7 +187,7 @@ export async function getDramaDetails(
       );
 
     const dramaDetailResponse = await serverFetch<DramaDetailResponse>({
-      path: "/drakor/phalcon/api/get_post_description_drakor/v2/",
+      path: `${API_BASE_PATH}/get_post_description_drakor/v2/`,
       opts: {
         method: "POST",
         headers: {
@@ -226,12 +216,9 @@ export async function searchDrama(
   >(request);
 
   const response = await serverFetch<MovieListResponse>({
-    path: "/drakor/phalcon/api/search_category_collection/v2/",
+    path: `${API_BASE_PATH}/search_category_collection/v2/`,
     opts: {
       method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
       body: params.toString(),
       next: { revalidate: TIME.ONE_DAY, tags: ["searchDrama"] }, // default to 60 seconds}
     },
@@ -242,7 +229,7 @@ export async function searchDrama(
 
 export async function getDramaCategoryType() {
   const response = await serverFetch<CategoryTypeResponse>({
-    path: "/drakor/phalcon/api/get_category_type_list/v2/",
+    path: `${API_BASE_PATH}/get_category_type_list/v2/`,
     opts: {
       next: { revalidate: TIME.ONE_DAY, tags: ["dramaCategoryType"] }, // default to 60 seconds}
     },
@@ -253,7 +240,7 @@ export async function getDramaCategoryType() {
 
 export async function getGenreList() {
   const response = await serverFetch<GenreListResponse>({
-    path: "/drakor/phalcon/api/get_genre_list/v2/",
+    path: `${API_BASE_PATH}/get_genre_list/v2/`,
     opts: {
       next: { revalidate: TIME.ONE_DAY, tags: ["genreList"] }, // default to 60 seconds}
     },
@@ -270,12 +257,9 @@ export async function getDramaByGenre(
   >(request);
 
   const response = await serverFetch<MovieListResponse>({
-    path: "/drakor/phalcon/api/get_drama_by_genre/v2/",
+    path: `${API_BASE_PATH}/get_drama_by_genre/v2/`,
     opts: {
       method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
       body: params.toString(),
       next: {
         revalidate: TIME.ONE_DAY,
