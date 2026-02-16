@@ -179,12 +179,12 @@ export async function getDramaDetails(
 
     const categoryPostResponse = await getCategoryPost(request);
 
-    if (request.channel_id) params.append("channel_id", request.channel_id);
-    else
-      params.append(
-        "channel_id",
-        categoryPostResponse.posts[0].channel_id.toString(),
-      );
+    params.append(
+      "channel_id",
+      request.channel_id ||
+        categoryPostResponse.posts[0]?.channel_id.toString() ||
+        categoryPostResponse.category.cid.toString(),
+    );
 
     const dramaDetailResponse = await serverFetch<DramaDetailResponse>({
       path: `${API_BASE_PATH}/get_post_description_drakor/v2/`,
