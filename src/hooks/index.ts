@@ -127,7 +127,7 @@ export function useVideoPlayer({ src, isHdAvailable }: UseVideoPlayerProps) {
 
     console.log("=== Initializing video player ===");
 
-    const videoSource = src[quality.toLowerCase() as "hd" | "sd"];
+    const videoSource = `/api/video/${src[quality.toLowerCase() as "hd" | "sd"]}`;
 
     if (hlsRef.current) {
       hlsRef.current.stopLoad();

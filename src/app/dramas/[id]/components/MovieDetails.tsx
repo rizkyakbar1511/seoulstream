@@ -13,7 +13,12 @@ import {
 } from "lucide-react";
 import parse from "html-react-parser";
 import { getDramaCredits, getDramaDetails } from "@/lib/api/server";
-import { formatViews, getPrevNextEpisode, isChannelIdMatch } from "@/lib/utils";
+import {
+  createVideoToken,
+  formatViews,
+  getPrevNextEpisode,
+  isChannelIdMatch,
+} from "@/lib/utils";
 import { format } from "date-fns";
 import sanitizeHtml from "sanitize-html";
 import { CategoryTypeNameEnum } from "@/types";
@@ -54,8 +59,8 @@ export default async function MovieDetail({
     views: drama?.count_view,
     videoSrc: {
       channelId: Number(channel_id),
-      hd: dramaDetails.channel_url_hd,
-      sd: dramaDetails.channel_url,
+      hd: await createVideoToken(dramaDetails.channel_url_hd),
+      sd: await createVideoToken(dramaDetails.channel_url),
     },
     isHdAvailable: dramaDetails.is_hd_available,
     poster: dramaDetails.img_url,
