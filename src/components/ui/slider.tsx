@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import * as SliderPrimitive from "@radix-ui/react-slider"
+import * as React from "react";
+import * as SliderPrimitive from "@radix-ui/react-slider";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 function Slider({
   className,
@@ -11,10 +11,10 @@ function Slider({
   value,
   min = 0,
   max = 100,
-  buffered,
+  bufferedPercent,
   ...props
 }: React.ComponentProps<typeof SliderPrimitive.Root> & {
-  buffered?: number // percentage (0-100) or absolute time
+  bufferedPercent?: number; // percentage (0-100) or absolute time
 }) {
   const _values = React.useMemo(
     () =>
@@ -23,13 +23,13 @@ function Slider({
         : Array.isArray(defaultValue)
           ? defaultValue
           : [min, max],
-    [value, defaultValue, min, max]
-  )
+    [value, defaultValue, min, max],
+  );
 
-  const bufferedPercent = React.useMemo(() => {
-    if (!buffered) return 0
-    return ((buffered - min) / (max - min)) * 100
-  }, [buffered, min, max])
+  const bufferedWidth = React.useMemo(() => {
+    if (!bufferedPercent) return 0;
+    return Math.min(Math.max(bufferedPercent, 0), 100);
+  }, [bufferedPercent]);
 
   return (
     <SliderPrimitive.Root
@@ -40,24 +40,24 @@ function Slider({
       max={max}
       className={cn(
         "relative flex w-full touch-none items-center select-none data-[disabled]:opacity-50 data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col",
-        className
+        className,
       )}
       {...props}
     >
       <SliderPrimitive.Track
         data-slot="slider-track"
         className={cn(
-          "bg-muted relative grow overflow-hidden rounded-full data-[orientation=horizontal]:h-1.5 data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5"
+          "bg-muted relative grow overflow-hidden rounded-full data-[orientation=horizontal]:h-1.5 data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5",
         )}
       >
         <div
-          className="absolute left-0 top-0 h-full bg-gray-400"
-          style={{ width: `${bufferedPercent}%` }}
+          className="absolute left-0 top-0 h-full bg-gray-400 pointer-events-none"
+          style={{ width: `${bufferedWidth}%` }}
         />
         <SliderPrimitive.Range
           data-slot="slider-range"
           className={cn(
-            "bg-primary absolute data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full"
+            "bg-primary absolute data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full",
           )}
         />
       </SliderPrimitive.Track>
@@ -69,7 +69,7 @@ function Slider({
         />
       ))}
     </SliderPrimitive.Root>
-  )
+  );
 }
 
-export { Slider }
+export { Slider };

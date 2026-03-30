@@ -1,15 +1,21 @@
-import MovieLists from "@/components/movie/MovieLists";
-import { getDramaByGenre } from "@/lib/api/server";
+import DramaList from "@/features/drama/components/DramaList";
+import { fetchDramaByGenre } from "@/features/drama/server/service";
 
 interface DramaListByGenreProps {
-    genre: string
+  genre: string;
 }
 
-export default async function DramaListByGenre({ genre }: DramaListByGenreProps) {
-    const response = await getDramaByGenre({ genre1: genre, isAPKvalid: true });
+export default async function DramaListByGenre({
+  genre,
+}: DramaListByGenreProps) {
+  const response = await fetchDramaByGenre({ genre1: genre, isAPKvalid: true });
 
-    return <>
-        <h3>{response.count_total} Results for {genre}</h3>
-        <MovieLists data={response} />
+  return (
+    <>
+      <h3>
+        {response.meta.totalItems} Results for {genre}
+      </h3>
+      <DramaList data={response} variant="grid" />
     </>
+  );
 }

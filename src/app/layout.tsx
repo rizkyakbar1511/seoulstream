@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
-import { ThemeProvider } from 'next-themes'
+import { ThemeProvider } from "next-themes";
 import "./globals.css";
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import Header from "@/components/Header";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import Header from "@/components/layout/Header";
 import QueryProvider from "../components/QueryProvider";
 import ProgressBarProvider from "@/components/ProgressBarProvider";
 
@@ -34,11 +34,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${poppins.className} antialiased min-h-screen`}
-      >
+      <body className={`${poppins.className} antialiased min-h-screen`}>
         <QueryProvider>
-          <ThemeProvider attribute="class" defaultTheme="dark" disableTransitionOnChange>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            disableTransitionOnChange
+          >
             <ProgressBarProvider>
               <Header />
               {children}

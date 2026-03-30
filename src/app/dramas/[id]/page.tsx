@@ -1,17 +1,17 @@
 import { Suspense } from "react";
-import MovieDetails from "@/app/dramas/[id]/components/MovieDetails";
-import MovieDetailsLoading from "./components/MovieDetailsLoading";
+import DramaDetails from "@/app/dramas/[id]/components/DramaDetails";
+import DramaDetailsLoading from "@/app/dramas/[id]/components/DramaDetailsLoading";
 
-interface DramasPageProps {
-    params: Promise<{ id: string }>,
-    searchParams: Promise<{ channel_id?: string }>,
-}
+export default async function DramasPage({
+  params,
+  searchParams,
+}: PageProps<"/dramas/[id]">) {
+  const { id } = await params;
+  const { channel_id } = await searchParams;
 
-export default async function DramasPage({ params, searchParams }: DramasPageProps) {
-    const { id } = await params;
-    const { channel_id } = await searchParams;
-
-    return <Suspense fallback={<MovieDetailsLoading />}>
-        <MovieDetails id={id} channel_id={channel_id} />
+  return (
+    <Suspense fallback={<DramaDetailsLoading />}>
+      <DramaDetails id={id} channel_id={channel_id} />
     </Suspense>
+  );
 }

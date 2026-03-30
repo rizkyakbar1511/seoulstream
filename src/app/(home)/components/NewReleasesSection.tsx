@@ -1,7 +1,18 @@
-import MovieSection from "@/components/movie/MovieSection";
-import { getNewPostsDrama } from "@/lib/api/server";
+import DramaSection from "@/features/drama/components/DramaSection";
+import { fetchNewDramaList } from "@/features/drama/server/service";
 
 export default async function NewReleasesSection() {
-    const data = await getNewPostsDrama({ page: 1, count: 20, isAPKvalid: true });
-    return <MovieSection title="New Releases" data={data} href="/new-releases" carouselList />
+  const data = await fetchNewDramaList({
+    page: 1,
+    count: 20,
+    isAPKvalid: true,
+  });
+  return (
+    <DramaSection
+      title="New Releases"
+      data={data}
+      viewAllHref="/new-releases"
+      variant="carousel"
+    />
+  );
 }
