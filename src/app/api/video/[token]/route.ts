@@ -2,7 +2,7 @@ import {
   createVideoToken,
   replaceURIWithToken,
   verifyVideoToken,
-} from "@/lib/utils";
+} from "@/features/video-player/utils";
 
 export const runtime = "nodejs";
 
@@ -14,6 +14,7 @@ export async function GET(
   const range = req.headers.get("range");
 
   if (!token) {
+    console.log("Missing token");
     return new Response("Missing token", { status: 403 });
   }
 
@@ -22,6 +23,7 @@ export async function GET(
   try {
     videoUrl = await verifyVideoToken(token);
   } catch {
+    console.log("Invalid or expired token");
     return new Response("Invalid or expired token", { status: 403 });
   }
 

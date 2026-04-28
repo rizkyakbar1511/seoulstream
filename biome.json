@@ -1,0 +1,12 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.4.8/schema.json",
+  "linter": {
+    "rules": {
+      "a11y": {
+        "useMediaCaption": "off",
+        "noStaticElementInteractions": "off",
+        "noNoninteractiveTabindex": "off"
+      }
+    }
+  }
+}

@@ -1,14 +1,15 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getCategoryPost } from "@/lib/api/server";
+import { fetchDramaCategoryPosts } from "@/features/drama/server/service";
 
 export async function POST(request: NextRequest) {
-	const body = (await request.json()) as {
-		id: string;
-		page: number;
-		count: number;
-		isAPKvalid: boolean;
-	};
-	const response = await getCategoryPost(body);
-
-	return NextResponse.json(response);
+  try {
+    const body = await request.json();
+    const response = await fetchDramaCategoryPosts(body);
+    return NextResponse.json(response);
+  } catch {
+    return NextResponse.json(
+      { error: "Failed to fetch category posts" },
+      { status: 500 },
+    );
+  }
 }

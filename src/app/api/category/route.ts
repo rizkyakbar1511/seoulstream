@@ -1,8 +1,14 @@
 import { NextResponse } from "next/server";
-import { getDramaCategoryType } from "@/lib/api/server";
+import { fetchDramaCategoryTypes } from "@/features/drama/server/service";
 
 export async function GET() {
-	const response = await getDramaCategoryType();
-
-	return NextResponse.json(response);
+  try {
+    const response = await fetchDramaCategoryTypes();
+    return NextResponse.json(response);
+  } catch {
+    return NextResponse.json(
+      { error: "Failed to fetch category types" },
+      { status: 500 },
+    );
+  }
 }
