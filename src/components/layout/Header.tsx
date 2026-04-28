@@ -5,7 +5,7 @@ import DramaSearchDialog from "@/features/drama/components/DramaSearchDialog";
 import Link from "next/link";
 import { LoaderCircleIcon, Shuffle } from "lucide-react";
 import { Button } from "../ui/button";
-import { useEffect, useState, useTransition } from "react";
+import { useTransition } from "react";
 import { shuffleDrama } from "@/features/drama/server/actions";
 
 const ThemeSwitcher = dynamic(() => import("@/components/ThemeSwitcher"), {
