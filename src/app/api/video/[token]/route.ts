@@ -30,7 +30,7 @@ export async function GET(
   try {
     const { hostname } = new URL(videoUrl);
 
-    const isAllowedProxy = hostname.includes(process.env.PROXY_VIDEO_HOSTNAME);
+    const isAllowedProxy = hostname.includes(process.env.PROXY_VIDEO_HOSTNAME!);
 
     const headers: Record<string, string> = {
       "Accept-Encoding": "identity",
@@ -38,8 +38,8 @@ export async function GET(
     };
 
     if (isAllowedProxy) {
-      headers["User-Agent"] = process.env.PROXY_VIDEO_USER_AGENT;
-      headers.Authorization = `Basic ${process.env.PROXY_VIDEO_ACCESS_TOKEN}`;
+      headers["User-Agent"] = process.env.PROXY_VIDEO_USER_AGENT!;
+      headers.Authorization = `Basic ${process.env.PROXY_VIDEO_ACCESS_TOKEN!}`;
       headers["Icy-MetaData"] = "1";
     }
 
@@ -84,7 +84,7 @@ export async function GET(
       return new Response(playlist, {
         headers: {
           "Content-Type": "application/vnd.apple.mpegurl",
-          "Access-Control-Allow-Origin": process.env.HOST,
+          "Access-Control-Allow-Origin": process.env.HOST!,
         },
       });
     }
@@ -94,7 +94,7 @@ export async function GET(
     responseHeaders.delete("transfer-encoding");
     responseHeaders.delete("connection");
 
-    responseHeaders.set("Access-Control-Allow-Origin", process.env.HOST);
+    responseHeaders.set("Access-Control-Allow-Origin", process.env.HOST!);
     responseHeaders.set("Cache-Control", "no-store");
     responseHeaders.set("Vary", "Origin");
 

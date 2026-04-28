@@ -140,7 +140,7 @@ export default async function DramaDetails({
                     <Avatar className="size-20 mb-2">
                       <AvatarImage
                         className="object-cover"
-                        src={`${process.env.NEXT_PUBLIC_TMDB_IMAGE_URL}/w500/${actor.avatar}`}
+                        src={`${process.env.NEXT_PUBLIC_TMDB_IMAGE_URL!}/w500/${actor.avatar}`}
                       />
                       <AvatarFallback>{actor.name.slice(0, 2)}</AvatarFallback>
                     </Avatar>
@@ -171,7 +171,7 @@ export default async function DramaDetails({
                     <Avatar className="size-20 mb-2">
                       <AvatarImage
                         className="object-cover"
-                        src={`${process.env.NEXT_PUBLIC_TMDB_IMAGE_URL}/w92/${actor.avatar}`}
+                        src={`${process.env.NEXT_PUBLIC_TMDB_IMAGE_URL!}/w92/${actor.avatar}`}
                       />
                       <AvatarFallback>{actor.name.slice(0, 2)}</AvatarFallback>
                     </Avatar>

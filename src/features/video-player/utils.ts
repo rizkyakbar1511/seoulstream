@@ -24,7 +24,7 @@ export const isChannelIdMatch = (
 };
 
 function getVideoTokenSecret() {
-  const secret = process.env.VIDEO_URL_SECRET;
+  const secret = process.env.VIDEO_URL_SECRET!;
 
   if (!secret) {
     throw new Error("VIDEO_SECRET missing");

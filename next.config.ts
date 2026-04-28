@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // allowedDevOrigins: [process.env.LOCAL_DEV_ALLOWED],
+  allowedDevOrigins: [process.env.LOCAL_DEV_ALLOWED!],
   /* config options here */
   images: {
     remotePatterns: [
