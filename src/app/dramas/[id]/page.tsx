@@ -2,6 +2,8 @@ import { Suspense } from "react";
 import DramaDetails from "@/app/dramas/[id]/components/DramaDetails";
 import DramaDetailsLoading from "@/app/dramas/[id]/components/DramaDetailsLoading";
 
+export const dynamic = "force-dynamic";
+
 export default async function DramasPage({
   params,
   searchParams,

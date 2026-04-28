@@ -5,7 +5,9 @@ import type {
   DramaDetailResponseDTO,
   DramaEpisodeDTO,
 } from "./dto";
+import { TmdbCreditsResponseDTO } from "./server/api/tmdb/dto";
 import type {
+  Credits,
   Drama,
   DramaCategoryType,
   DramaCategoryTypeList,
@@ -71,5 +73,22 @@ export function mapDramaCategoryTypeList(
   return {
     items: dto.category_type.map(mapDramaCategoryType),
     total: Number(dto.count_total),
+  };
+}
+
+export function mapDramaCredits(dto: TmdbCreditsResponseDTO): Credits {
+  return {
+    cast: dto.cast.map((c) => ({
+      id: c.credit_id,
+      name: c.name,
+      character: c.character,
+      avatar: c.profile_path ?? "",
+    })),
+    crew: dto.crew.map((c) => ({
+      id: c.credit_id,
+      name: c.name,
+      job: c.job,
+      avatar: c.profile_path ?? "",
+    })),
   };
 }

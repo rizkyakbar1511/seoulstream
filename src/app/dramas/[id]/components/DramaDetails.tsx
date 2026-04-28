@@ -15,7 +15,10 @@ import parse from "html-react-parser";
 import { format } from "date-fns";
 import sanitizeHtml from "sanitize-html";
 import DramaEpisodeList from "./DramaEpisodeList";
-import { fetchDramaWatchData } from "@/features/drama/server/service";
+import {
+  fetchDramaCredits,
+  fetchDramaWatchData,
+} from "@/features/drama/server/service";
 import { formatViews } from "@/features/drama/utils";
 import { DramaCategoryTypeEnum } from "@/features/drama/types";
 import { VideoPlayer } from "@/features/video-player/components/VideoPlayer";
@@ -36,6 +39,7 @@ export default async function DramaDetails({
     meta,
     video,
     prevEpisode,
+    currentEpisode,
     nextEpisode,
   } = await fetchDramaWatchData({
     id: Number(id),
@@ -45,12 +49,19 @@ export default async function DramaDetails({
     isAPKvalid: true,
   });
 
+  const { cast, crew } = await fetchDramaCredits(
+    drama.type === DramaCategoryTypeEnum.MOVIE ? "movie" : "tv",
+    {
+      query: drama.title,
+    },
+  );
+
   return (
     <main className="container mx-auto p-4 sm:p-5 space-y-8">
       <VideoPlayer
         src={video}
-        title={drama.title}
-        poster={drama.poster}
+        title={currentEpisode.title}
+        poster={currentEpisode.poster}
         isHdAvailable={isHdAvailable}
         prevEpisode={prevEpisode}
         nextEpisode={nextEpisode}
@@ -113,7 +124,7 @@ export default async function DramaDetails({
               {parse(sanitizeHtml(descriptionHtml))}
             </CardContent>
           </Card>
-          {/*{!!dramaCredits.cast.length && (
+          {!!cast.length && (
             <Card className="shadow-lg">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -121,15 +132,15 @@ export default async function DramaDetails({
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {dramaCredits.cast.map((actor) => (
+                {cast.map((actor) => (
                   <div
                     className="flex flex-col items-center justify-center text-center"
-                    key={actor.credit_id}
+                    key={actor.id}
                   >
                     <Avatar className="size-20 mb-2">
                       <AvatarImage
                         className="object-cover"
-                        src={`${process.env.NEXT_PUBLIC_TMDB_IMAGE_URL}/w500/${actor.profile_path}`}
+                        src={`${process.env.NEXT_PUBLIC_TMDB_IMAGE_URL}/w500/${actor.avatar}`}
                       />
                       <AvatarFallback>{actor.name.slice(0, 2)}</AvatarFallback>
                     </Avatar>
@@ -144,7 +155,7 @@ export default async function DramaDetails({
               </CardContent>
             </Card>
           )}
-          {!!dramaCredits.crew.length && (
+          {!!crew.length && (
             <Card className="shadow-lg">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -152,15 +163,15 @@ export default async function DramaDetails({
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {dramaCredits.crew.map((actor) => (
+                {crew.map((actor) => (
                   <div
                     className="flex flex-col items-center justify-center text-center"
-                    key={actor.credit_id}
+                    key={actor.id}
                   >
                     <Avatar className="size-20 mb-2">
                       <AvatarImage
                         className="object-cover"
-                        src={`${process.env.NEXT_PUBLIC_TMDB_IMAGE_URL}/w92/${actor.profile_path}`}
+                        src={`${process.env.NEXT_PUBLIC_TMDB_IMAGE_URL}/w92/${actor.avatar}`}
                       />
                       <AvatarFallback>{actor.name.slice(0, 2)}</AvatarFallback>
                     </Avatar>
@@ -174,7 +185,7 @@ export default async function DramaDetails({
                 ))}
               </CardContent>
             </Card>
-          )}*/}
+          )}
         </div>
         <div className="space-y-6">
           {drama.type !== DramaCategoryTypeEnum.MOVIE && (

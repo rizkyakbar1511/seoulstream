@@ -3,11 +3,11 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { isChannelIdMatch } from "@/features/streaming/utils";
 import Link from "next/link";
 import { formatViews } from "@/features/drama/utils";
 import type { DramaWithEpisodesResult } from "@/features/drama/types";
 import DramaLoadMoreEpisodes from "@/app/dramas/[id]/components/DramaLoadMoreEpisodes";
+import { isChannelIdMatch } from "@/features/video-player/utils";
 
 interface EpisodeListProps {
   id: string;

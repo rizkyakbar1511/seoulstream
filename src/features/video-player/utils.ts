@@ -15,6 +15,13 @@ export function formatVideoTime(seconds: number) {
 }
 
 export const isHlsStreamUrl = (url: string) => /\.m3u8(\?|$)/i.test(url);
+export const isChannelIdMatch = (
+  channel_id: number | undefined,
+  post_channel_id: number,
+  index: number,
+) => {
+  return channel_id ? Number(channel_id) === post_channel_id : index === 0;
+};
 
 function getVideoTokenSecret() {
   const secret = process.env.VIDEO_URL_SECRET;

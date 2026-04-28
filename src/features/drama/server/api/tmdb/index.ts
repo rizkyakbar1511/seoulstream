@@ -1,17 +1,37 @@
 import { config } from "@/lib/config";
 import { http } from "@/lib/http";
-import type { TmdbCreditsResponse, TmdbSearchResponse } from "./types";
+import type {
+  TmdbCreditsRequestDTO,
+  TmdbCreditsResponseDTO,
+  TmdbSearchRequestDTO,
+  TmdbSearchResponseDTO,
+  TmdbSearchType,
+} from "./dto";
+import { buildParams } from "@/lib/utils";
 
-export async function getDramaCredits({
-  type,
-  query,
-}: {
-  type: string;
-  query: string;
-}) {
-  const dramaResponse = await http<TmdbSearchResponse>({
+export function searchTmdb(
+  type: TmdbSearchType,
+  request: TmdbSearchRequestDTO<TmdbSearchType>,
+) {
+  const params = buildParams(request);
+
+  return http<TmdbSearchResponseDTO<TmdbSearchType>>({
     baseURL: config.TMDB_API_BASE_URL,
-    path: `/search/${type}?query=${query}`,
+    path: `/search/${type}?${params.toString()}`,
+    opts: {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${config.TMDB_READ_ACCESS_TOKEN}`,
+        accept: "application/json",
+      },
+    },
+  });
+}
+
+export function getCreditsTmdb(request: TmdbCreditsRequestDTO) {
+  return http<TmdbCreditsResponseDTO>({
+    baseURL: config.TMDB_API_BASE_URL,
+    path: `/${request.type}/${request.id}/credits?${request.language ? `language=${request.language}` : ""}`,
     opts: {
       headers: {
         Authorization: `Bearer ${config.TMDB_READ_ACCESS_TOKEN}`,
@@ -19,23 +39,4 @@ export async function getDramaCredits({
       },
     },
   });
-
-  if (dramaResponse.results.length === 0)
-    return {
-      crew: [],
-      cast: [],
-    };
-
-  const creditsResponse = await http<TmdbCreditsResponse>({
-    baseURL: config.TMDB_API_BASE_URL,
-    path: `/${type}/${dramaResponse.results[0].id}/credits`,
-    opts: {
-      headers: {
-        Authorization: `Bearer ${config.TMDB_READ_ACCESS_TOKEN}`,
-        accept: "application/json",
-      },
-    },
-  });
-
-  return creditsResponse;
 }

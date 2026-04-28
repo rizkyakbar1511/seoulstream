@@ -172,7 +172,7 @@ export function VideoPlayer({
         </FeedbackOverlay>
         <div
           className={cn(
-            "absolute top-1/2 -translate-y-1/2 left-16 flex items-center justify-center gap-1 transition-transform scale-0",
+            "absolute top-1/2 -translate-y-1/2 left-16 flex items-center justify-center gap-1 transition-transform scale-0 text-white",
             { "scale-100": seekFeedback !== null && seekFeedback < 0 },
           )}
         >
@@ -189,7 +189,7 @@ export function VideoPlayer({
         </FeedbackOverlay>
         <div
           className={cn(
-            "absolute top-1/2 -translate-y-1/2 right-16 flex items-center justify-center gap-1 transition-transform scale-0",
+            "absolute top-1/2 -translate-y-1/2 right-16 flex items-center justify-center gap-1 transition-transform scale-0 text-white",
             { "scale-100": seekFeedback !== null && seekFeedback > 0 },
           )}
         >
@@ -214,7 +214,7 @@ export function VideoPlayer({
             },
           )}
         >
-          <h3 className="truncate uppercase font-bold text-xs xs:text-base absolute top-10 left-10">
+          <h3 className="truncate uppercase font-bold text-xs xs:text-base absolute top-10 left-10 text-white">
             {title}
           </h3>
         </div>

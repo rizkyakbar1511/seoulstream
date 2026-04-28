@@ -7,6 +7,7 @@ import type {
   DramaSearchRequestDTO,
 } from "../dto";
 import {
+  getCreditsTmdb,
   getDramaByGenre,
   getDramaCategoryPosts,
   getDramaCategoryTypes,
@@ -15,10 +16,12 @@ import {
   getNewDramaPosts,
   getOngoingDramas,
   searchDramas,
+  searchTmdb,
 } from "./api";
 import {
   mapDrama,
   mapDramaCategoryTypeList,
+  mapDramaCredits,
   mapDramaDetail,
   mapEpisode,
 } from "../mapper";
@@ -26,6 +29,7 @@ import {
   createVideoToken,
   isHlsStreamUrl,
 } from "@/features/video-player/utils";
+import type { TmdbSearchRequestDTO, TmdbSearchType } from "./api/tmdb/dto";
 
 export async function fetchDramaList(request: DramaListRequestDTO) {
   const res = await getDramaList(request);
@@ -131,10 +135,7 @@ export async function fetchDramaWatchData({
 
   const currentIndex = episodes.findIndex((e) => e.id === currentEpisodeId);
 
-  const drama = {
-    ...mapDrama(postsRes.category),
-    title: episodes[currentIndex]?.title,
-  };
+  const drama = mapDrama(postsRes.category);
 
   const currentEpisode = episodes[currentIndex];
   const prevEpisode = currentIndex > 0 ? episodes[currentIndex - 1] : null;
@@ -190,4 +191,23 @@ export async function fetchDramaSearch(request: DramaSearchRequestDTO) {
 export async function fetchDramaCategoryTypes() {
   const res = await getDramaCategoryTypes();
   return mapDramaCategoryTypeList(res);
+}
+
+export async function fetchDramaCredits(
+  type: TmdbSearchType,
+  request: TmdbSearchRequestDTO<TmdbSearchType>,
+) {
+  const searchRes = await searchTmdb(type, request);
+  if (searchRes.results.length === 0)
+    return {
+      cast: [],
+      crew: [],
+    };
+
+  const creditsRes = await getCreditsTmdb({
+    id: searchRes.results[0].id,
+    type: type as "movie" | "tv",
+  });
+
+  return mapDramaCredits(creditsRes);
 }

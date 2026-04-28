@@ -160,7 +160,7 @@ export default function MovieSearchDialog() {
         <CommandList>
           {isFetching && (
             <div className="space-y-2 p-3">
-              {Array.from({ length: 8 }).map(() => (
+              {Array.from({ length: 4 }).map(() => (
                 <Skeleton
                   className="h-14 w-full"
                   key={`skeleton-${Math.random()}`}

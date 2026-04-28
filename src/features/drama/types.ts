@@ -73,3 +73,18 @@ export interface DramaCategoryTypeList {
   items: DramaCategoryType[];
   total: number;
 }
+
+export interface Credits {
+  cast: {
+    id: string;
+    name: string;
+    character: string;
+    avatar: string;
+  }[];
+  crew: {
+    id: string;
+    name: string;
+    job: string;
+    avatar: string;
+  }[];
+}
