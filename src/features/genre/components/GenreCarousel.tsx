@@ -7,12 +7,12 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
-import type { Genre } from "@/types";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
+import type { GenreList } from "../types";
 
 interface GenreCarouselProps {
-  genres: Genre[];
+  genres: GenreList;
   currentGenre?: string;
 }
 
@@ -23,8 +23,8 @@ export default function GenreCarousel({
   const [api, setApi] = useState<CarouselApi>();
 
   // Find active index
-  const activeIndex = genres.findIndex(
-    (genre) => genre.genre_name.toLowerCase() === currentGenre.toLowerCase(),
+  const activeIndex = genres.items.findIndex(
+    (genre) => genre.label.toLowerCase() === currentGenre.toLowerCase(),
   );
 
   useEffect(() => {
@@ -47,22 +47,19 @@ export default function GenreCarousel({
       setApi={setApi}
     >
       <CarouselContent className="pb-2">
-        {genres.map((genre, index) => {
+        {genres.items.map((genre, index) => {
           const isActive = index === activeIndex;
           return (
-            <CarouselItem
-              className="basis-1/3 md:basis-1/6"
-              key={genre.genre_id}
-            >
+            <CarouselItem className="basis-1/3 md:basis-1/6" key={genre.id}>
               <Link
                 className={buttonVariants({
                   variant: isActive ? "default" : "secondary",
                   className: "w-full",
                   size: "sm",
                 })}
-                href={`/genre/${genre.genre_name}`}
+                href={`/genre/${genre.label}`}
               >
-                {genre.genre_name}
+                {genre.label}
               </Link>
             </CarouselItem>
           );
