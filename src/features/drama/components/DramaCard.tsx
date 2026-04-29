@@ -3,7 +3,6 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Eye, Star } from "lucide-react";
 import Link from "next/link";
-import { IMAGE_BLUR_PLACEHOLDER } from "@/constants";
 import { formatViews, getTimestampCaption } from "../utils";
 import type { Drama } from "../types";
 
@@ -22,12 +21,10 @@ export default function DramaCard({ data }: DramaCardProps) {
             "
         >
           <Image
-            placeholder="blur"
             className="md:group-hover:scale-105 md:transition-transform md:duration-300 md:ease-in-out"
             src={data.poster}
             fill
             alt={data.title}
-            blurDataURL={IMAGE_BLUR_PLACEHOLDER}
             draggable={false}
             loading="lazy"
             fetchPriority="low"
