@@ -9,7 +9,6 @@ import {
   MediaProvider,
   Poster,
   Menu,
-  ChapterTitle,
 } from "@vidstack/react";
 import {
   PlyrLayout,
@@ -162,7 +161,6 @@ export default function VideoPlayer({
         <MediaProvider>
           <Poster className="vds-poster" src={poster} alt={title} />
         </MediaProvider>
-        <ChapterTitle className="media-chapter-title" defaultText="test" />
         <PlyrLayout
           thumbnails={poster}
           icons={plyrLayoutIcons}
