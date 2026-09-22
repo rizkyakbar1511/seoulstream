@@ -1,4 +1,6 @@
+import type { Dispatch, SetStateAction } from "react";
 import {
+  type CarouselApi,
   Carousel,
   CarouselContent,
   CarouselItem,
@@ -7,14 +9,16 @@ import type { DramaListResult } from "../types";
 import DramaCard from "./DramaCard";
 
 interface DramaListProps {
+  setApi: Dispatch<SetStateAction<CarouselApi>>;
   data: DramaListResult;
   variant: "grid" | "carousel";
 }
 
-export default function DramaList({ data, variant }: DramaListProps) {
+export default function DramaList({ data, variant, setApi }: DramaListProps) {
   if (variant === "carousel") {
     return (
       <Carousel
+        setApi={setApi}
         className="w-full"
         opts={{
           dragFree: true,

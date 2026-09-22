@@ -1,13 +1,18 @@
-import { getGenreList } from "@/features/genre/api";
-import GenreCarousel from "./GenreCarousel";
 import { fetchGenreList } from "../service";
+import GenreCollapsible from "./GenreCollapsible";
 
-interface GenreListProps {
-  currentGenre?: string;
-}
-
-export default async function GenreList({ currentGenre }: GenreListProps) {
+export default async function GenreList() {
   const genres = await fetchGenreList();
 
-  return <GenreCarousel genres={genres} currentGenre={currentGenre} />;
+  return (
+    <section className="space-y-3">
+      <div className="mb-5 flex flex-col after:relative after:bg-primary after:mt-1 after:w-10 after:h-1.5 after:rounded-lg after:block">
+        <h2 className="font-semibold text-xl">Browse by Genre</h2>
+        <p className="text-sm text-muted-foreground">
+          Pick a genre to see everything in it
+        </p>
+      </div>
+      <GenreCollapsible genres={genres} />
+    </section>
+  );
 }

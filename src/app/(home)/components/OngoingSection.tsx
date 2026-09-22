@@ -4,7 +4,7 @@ import { fetchOngoingDramas } from "@/features/drama/server/service";
 export default async function OngoingSection() {
   const data = await fetchOngoingDramas({
     page: 1,
-    count: 20,
+    count: 10,
     isAPKvalid: true,
   });
   return (

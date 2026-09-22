@@ -4,6 +4,11 @@ export interface DramaListRequestDTO {
   isAPKvalid: boolean;
 }
 
+export interface DramaWatchRequestDTO extends DramaListRequestDTO {
+  id: number;
+  channel_id?: number;
+}
+
 export interface DramaCategoryDTO {
   cid: number;
   category_name: string;

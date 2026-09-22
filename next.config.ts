@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "**", // This wildcard allows all hostnames
       },
+      {
+        protocol: "http",
+        hostname: "**", // This wildcard allows all hostnames
+      },
     ],
   },
 };

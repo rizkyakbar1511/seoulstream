@@ -1,12 +1,27 @@
 import type { Episode, VideoSource } from "../drama/types";
 
-export type VideoPlayerProps = {
-  src?: VideoSource;
-  isHdAvailable: boolean;
-  title?: string;
-  poster?: string;
-  className?: string;
-  prevEpisode: Episode | null;
-  nextEpisode: Episode | null;
+export type VideoPlayerProps = Pick<
+	Episode,
+	"id" | "category_id" | "title" | "poster" | "isHdAvailable"
+> & {
+	video?: VideoSource;
+	className?: string;
+	prevEpisode: Episode | null;
+	nextEpisode: Episode | null;
+	totalEpisodes: number;
 };
-export type Quality = "sd" | "hd";
+
+export enum Quality {
+	SD = "sd",
+	HD = "hd",
+}
+
+export type ContinueWatch = Pick<
+	Episode,
+	"id" | "category_id" | "title" | "poster"
+> & {
+	position: number;
+	duration: number;
+	updatedAt: number;
+	totalEpisodes: number;
+};

@@ -4,8 +4,7 @@ import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import Header from "@/components/layout/Header";
-import QueryProvider from "../components/QueryProvider";
-import ProgressBarProvider from "@/components/ProgressBarProvider";
+import { ProgressBarProvider, QueryProvider } from "@/components/providers";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -33,8 +32,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${poppins.className} antialiased min-h-screen`}>
+    <html lang="en" className={poppins.className} suppressHydrationWarning>
+      <body className="antialiased min-h-screen">
         <QueryProvider>
           <ThemeProvider
             attribute="class"

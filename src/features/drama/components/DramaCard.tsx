@@ -1,10 +1,10 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Clock, Eye, Star } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
-import { formatViews, getTimestampCaption } from "../utils";
 import type { Drama } from "../types";
+import { formatViews, getTimestampCaption } from "../utils";
 
 interface DramaCardProps {
   data: Drama;
@@ -16,8 +16,8 @@ export default function DramaCard({ data }: DramaCardProps) {
       <Card className="p-0 gap-0 group shadow-2xl dark:shadow-none overflow-hidden rounded-lg">
         <CardHeader
           className="
-            relative w-full aspect-[2/3] p-0 overflow-hidden
-            after:absolute after:w-full after:h-full after:bottom-0 after:right-0 after:left-0 after:bg-gradient-to-t after:from-card after:to-45% after:to-transparent
+            relative w-full aspect-2/3 p-0 overflow-hidden
+            after:absolute after:w-full after:h-full after:bottom-0 after:right-0 after:left-0 after:bg-linear-to-t after:from-card after:to-45% after:to-transparent
             "
         >
           <Image
@@ -27,7 +27,6 @@ export default function DramaCard({ data }: DramaCardProps) {
             alt={data.title}
             draggable={false}
             loading="lazy"
-            fetchPriority="low"
             sizes="(max-width: 480px) 100vw, (max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
           />
 

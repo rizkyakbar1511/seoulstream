@@ -64,7 +64,7 @@ export default function MovieSearchDialog() {
       });
       return res.json();
     },
-    enabled: debouncedQuery.length > 2,
+    enabled: debouncedQuery.length > 1,
     refetchOnWindowFocus: false,
   });
 
@@ -117,7 +117,11 @@ export default function MovieSearchDialog() {
         </div>
         <Search className="size-4 sm:hidden" />
       </Button>
-      <CommandDialog open={open} onOpenChange={onOpenChangeCommandDialog}>
+      <CommandDialog
+        className="max-w-none! w-screen! h-screen!"
+        open={open}
+        onOpenChange={onOpenChangeCommandDialog}
+      >
         <CommandInput
           placeholder="Type movie name, eg. Itaewon"
           value={query}
@@ -157,7 +161,7 @@ export default function MovieSearchDialog() {
                 ))}
           </div>
         </div>
-        <CommandList>
+        <CommandList className="max-h-none">
           {isFetching && (
             <div className="space-y-2 p-3">
               {Array.from({ length: 4 }).map(() => (
@@ -168,23 +172,21 @@ export default function MovieSearchDialog() {
               ))}
             </div>
           )}
-          {debouncedQuery.length <= 2 && !isFetching && (
+          {debouncedQuery.length <= 1 && !isFetching && (
             <DramaSearchFallback message="Type to search movies..." />
           )}
           {!isFetching &&
-            debouncedQuery.length > 2 &&
+            debouncedQuery.length > 1 &&
             searchData?.meta.totalItems === 0 && (
-              <CommandEmpty>
-                <div className="flex items-center flex-col gap-2">
-                  <Search className="size-6" />
-                  <h6 className="text-sm">
-                    No results found for "{debouncedQuery}"
-                  </h6>
-                  <p className="text-xs text-muted-foreground">
-                    Try adjusting your search or filter to find what you're
-                    looking for.
-                  </p>
-                </div>
+              <CommandEmpty className="flex items-center flex-col gap-2 pt-28">
+                <Search className="size-10" />
+                <h6 className="text-sm">
+                  No results found for "{debouncedQuery}"
+                </h6>
+                <p className="text-xs text-muted-foreground">
+                  Try adjusting your search or filter to find what you're
+                  looking for.
+                </p>
               </CommandEmpty>
             )}
           <CommandGroup
@@ -213,6 +215,7 @@ export default function MovieSearchDialog() {
                       objectFit="cover"
                       fill
                       loading="lazy"
+                      sizes="(max-width: 480px) 100vw, (max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
                     />
                   </div>
                   <div className="flex-1 min-w-0">

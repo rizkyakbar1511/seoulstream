@@ -13,7 +13,7 @@ export default async function DramasPage({
 
   return (
     <Suspense fallback={<DramaDetailsLoading />}>
-      <DramaDetails id={id} channel_id={channel_id} />
+      <DramaDetails id={id} channel_id={channel_id as string} />
     </Suspense>
   );
 }

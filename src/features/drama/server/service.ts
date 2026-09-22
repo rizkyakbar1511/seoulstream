@@ -1,213 +1,221 @@
 import "server-only";
+import {
+	createVideoToken,
+	isHlsStreamUrl,
+} from "@/features/video-player/utils";
 import type {
-  DramaByGenreRequestDTO,
-  DramaCategoryPostsRequestDTO,
-  DramaDetailRequestDTO,
-  DramaListRequestDTO,
-  DramaSearchRequestDTO,
+	DramaByGenreRequestDTO,
+	DramaCategoryPostsRequestDTO,
+	DramaDetailRequestDTO,
+	DramaListRequestDTO,
+	DramaSearchRequestDTO,
+	DramaWatchRequestDTO,
 } from "../dto";
 import {
-  getCreditsTmdb,
-  getDramaByGenre,
-  getDramaCategoryPosts,
-  getDramaCategoryTypes,
-  getDramaDetail,
-  getDramaList,
-  getNewDramaPosts,
-  getOngoingDramas,
-  searchDramas,
-  searchTmdb,
-} from "./api";
-import {
-  mapDrama,
-  mapDramaCategoryTypeList,
-  mapDramaCredits,
-  mapDramaDetail,
-  mapEpisode,
+	mapDrama,
+	mapDramaCategoryTypeList,
+	mapDramaCredits,
+	mapDramaDetail,
+	mapEpisode,
 } from "../mapper";
 import {
-  createVideoToken,
-  isHlsStreamUrl,
-} from "@/features/video-player/utils";
+	getCreditsTmdb,
+	getDramaByGenre,
+	getDramaCategoryPosts,
+	getDramaCategoryTypes,
+	getDramaDetail,
+	getDramaList,
+	getNewDramaPosts,
+	getOngoingDramas,
+	searchDramas,
+	searchTmdb,
+} from "./api";
 import type { TmdbSearchRequestDTO, TmdbSearchType } from "./api/tmdb/dto";
 
 export async function fetchDramaList(request: DramaListRequestDTO) {
-  const res = await getDramaList(request);
+	const res = await getDramaList(request);
 
-  const filtered = res.categories.filter((item) => item.cid !== 1);
+	const filtered = res.categories.filter((item) => item.cid !== 1);
 
-  return {
-    dramas: filtered.map(mapDrama),
-    meta: {
-      perPage: res.count,
-      totalItems: res.count_total,
-      currentPage: res.pages,
-      totalPages: Math.ceil(res.count_total / res.count),
-    },
-  };
+	return {
+		dramas: filtered.map(mapDrama),
+		meta: {
+			perPage: res.count,
+			totalItems: res.count_total,
+			currentPage: res.pages,
+			totalPages: Math.ceil(res.count_total / res.count),
+		},
+	};
 }
 
 export async function fetchDramaByGenre(request: DramaByGenreRequestDTO) {
-  const res = await getDramaByGenre(request);
-  const filtered = res.categories.filter((item) => item.cid !== 1);
+	const res = await getDramaByGenre(request);
+	const filtered = res.categories.filter((item) => item.cid !== 1);
 
-  return {
-    dramas: filtered.map(mapDrama),
-    meta: {
-      perPage: res.count,
-      totalItems: res.count_total,
-      currentPage: res.pages,
-      totalPages: Math.ceil(res.count_total / res.count),
-    },
-  };
+	return {
+		dramas: filtered.map(mapDrama),
+		meta: {
+			perPage: res.count,
+			totalItems: res.count_total,
+			currentPage: res.pages,
+			totalPages: Math.ceil(res.count_total / res.count),
+		},
+	};
 }
 
 export async function fetchNewDramaList(request: DramaListRequestDTO) {
-  const res = await getNewDramaPosts(request);
-  const filtered = res.categories.filter((item) => item.cid !== 1);
+	const res = await getNewDramaPosts(request);
+	const filtered = res.categories.filter((item) => item.cid !== 1);
 
-  return {
-    dramas: filtered.map(mapDrama),
-    meta: {
-      perPage: res.count,
-      totalItems: res.count_total,
-      currentPage: res.pages,
-      totalPages: Math.ceil(res.count_total / res.count),
-    },
-  };
+	return {
+		dramas: filtered.map(mapDrama),
+		meta: {
+			perPage: res.count,
+			totalItems: res.count_total,
+			currentPage: res.pages,
+			totalPages: Math.ceil(res.count_total / res.count),
+		},
+	};
 }
 
 export async function fetchOngoingDramas(request: DramaListRequestDTO) {
-  const res = await getOngoingDramas(request);
+	const res = await getOngoingDramas(request);
 
-  return {
-    dramas: res.categories.map(mapDrama),
-    meta: {
-      perPage: res.count,
-      totalItems: res.count_total,
-      currentPage: res.pages,
-      totalPages: Math.ceil(res.count_total / res.count),
-    },
-  };
+	return {
+		dramas: res.categories.map(mapDrama),
+		meta: {
+			perPage: res.count,
+			totalItems: res.count_total,
+			currentPage: res.pages,
+			totalPages: Math.ceil(res.count_total / res.count),
+		},
+	};
 }
 
 export async function fetchDramaCategoryPosts(
-  request: DramaCategoryPostsRequestDTO,
+	request: DramaCategoryPostsRequestDTO,
 ) {
-  const res = await getDramaCategoryPosts(request);
+	const res = await getDramaCategoryPosts(request);
 
-  const drama = mapDrama(res.category);
-  const episodes = res.posts.map(mapEpisode);
+	const drama = mapDrama(res.category);
+	const episodes = res.posts.map(mapEpisode);
 
-  return {
-    drama,
-    episodes,
-    meta: {
-      perPage: res.count,
-      totalItems: res.count_total,
-      currentPage: res.pages,
-      totalPages: Math.ceil(res.count_total / res.count),
-    },
-  };
+	return {
+		drama,
+		episodes,
+		meta: {
+			perPage: res.count,
+			totalItems: res.count_total,
+			currentPage: res.pages,
+			totalPages: Math.ceil(res.count_total / res.count),
+		},
+	};
 }
 
 export async function fetchDramaDetail(request: DramaDetailRequestDTO) {
-  const res = await getDramaDetail(request);
-  return mapDramaDetail(res);
+	const res = await getDramaDetail(request);
+	return mapDramaDetail(res);
 }
 
 export async function fetchDramaWatchData({
-  id,
-  channel_id,
-  ...rest
-}: {
-  id: number;
-  channel_id?: number;
-} & DramaListRequestDTO) {
-  const postsRes = await getDramaCategoryPosts({
-    id,
-    ...rest,
-  });
+	id,
+	channel_id,
+	...rest
+}: DramaWatchRequestDTO) {
+	let page = rest.page ?? 1;
+	let postsRes = await getDramaCategoryPosts({
+		id,
+		...rest,
+		page,
+	});
 
-  const episodes = postsRes.posts.map(mapEpisode);
+	let episodes = postsRes.posts.map(mapEpisode);
+	const currentEpisodeId = channel_id ?? episodes[0]?.id;
+	let currentIndex = episodes.findIndex((e) => e.id === currentEpisodeId);
 
-  const currentEpisodeId = channel_id ?? episodes[0]?.id;
+	const totalPages = Math.ceil(postsRes.count_total / postsRes.count);
 
-  const currentIndex = episodes.findIndex((e) => e.id === currentEpisodeId);
+	while (currentIndex === -1 && channel_id && page < totalPages) {
+		page += 1;
+		postsRes = await getDramaCategoryPosts({ id, ...rest, page });
+		episodes = postsRes.posts.map(mapEpisode);
+		currentIndex = episodes.findIndex((e) => e.id === currentEpisodeId);
+	}
 
-  const drama = mapDrama(postsRes.category);
+	const drama = mapDrama(postsRes.category);
 
-  const currentEpisode = episodes[currentIndex];
-  const prevEpisode = currentIndex > 0 ? episodes[currentIndex - 1] : null;
+	const currentEpisode = episodes[currentIndex];
 
-  const nextEpisode =
-    currentIndex < episodes.length - 1 ? episodes[currentIndex + 1] : null;
+	const prevEpisode = currentIndex > 0 ? episodes[currentIndex - 1] : null;
 
-  const detailRes = await getDramaDetail({
-    channel_id: currentEpisode.id,
-    isAPKvalid: true,
-  });
+	const nextEpisode =
+		currentIndex < episodes.length - 1 ? episodes[currentIndex + 1] : null;
 
-  const detail = mapDramaDetail(detailRes);
+	const detailRes = await getDramaDetail({
+		channel_id: currentEpisode.id,
+		isAPKvalid: true,
+	});
 
-  const video = {
-    sd: await createVideoToken(detail.video.sd),
-    hd: detail.video.hd ? await createVideoToken(detail.video.hd) : undefined,
-    isHls: isHlsStreamUrl(detail.video.hd || detail.video.sd),
-  };
+	const detail = mapDramaDetail(detailRes);
 
-  return {
-    drama,
-    episodes,
-    currentEpisode,
-    prevEpisode,
-    nextEpisode,
-    video,
-    descriptionHtml: detail.descriptionHtml,
-    isHdAvailable: detail.isHdAvailable,
-    meta: {
-      perPage: postsRes.count,
-      totalItems: postsRes.count_total,
-      currentPage: postsRes.pages,
-      totalPages: Math.ceil(postsRes.count_total / postsRes.count),
-    },
-  };
+	const video = {
+		sd: await createVideoToken(detail.video.sd),
+		hd: detail.video.hd ? await createVideoToken(detail.video.hd) : undefined,
+		isHls: isHlsStreamUrl(detail.video.hd || detail.video.sd),
+	};
+
+	return {
+		drama,
+		episodes,
+		currentEpisode,
+		prevEpisode,
+		nextEpisode,
+		video,
+		descriptionHtml: detail.descriptionHtml,
+		isHdAvailable: detail.isHdAvailable,
+		meta: {
+			perPage: postsRes.count,
+			totalItems: postsRes.count_total,
+			currentPage: postsRes.pages,
+			totalPages: Math.ceil(postsRes.count_total / postsRes.count),
+		},
+	};
 }
 
 export async function fetchDramaSearch(request: DramaSearchRequestDTO) {
-  const res = await searchDramas(request);
+	const res = await searchDramas(request);
 
-  return {
-    dramas: res.categories.filter((item) => item.cid !== 1).map(mapDrama),
-    meta: {
-      perPage: res.count,
-      totalItems: res.count_total,
-      currentPage: res.pages,
-      totalPages: Math.ceil(res.count_total / res.count),
-    },
-  };
+	return {
+		dramas: res.categories.filter((item) => item.cid !== 1).map(mapDrama),
+		meta: {
+			perPage: res.count,
+			totalItems: res.count_total,
+			currentPage: res.pages,
+			totalPages: Math.ceil(res.count_total / res.count),
+		},
+	};
 }
 
 export async function fetchDramaCategoryTypes() {
-  const res = await getDramaCategoryTypes();
-  return mapDramaCategoryTypeList(res);
+	const res = await getDramaCategoryTypes();
+	return mapDramaCategoryTypeList(res);
 }
 
 export async function fetchDramaCredits(
-  type: TmdbSearchType,
-  request: TmdbSearchRequestDTO<TmdbSearchType>,
+	type: TmdbSearchType,
+	request: TmdbSearchRequestDTO<TmdbSearchType>,
 ) {
-  const searchRes = await searchTmdb(type, request);
-  if (searchRes.results.length === 0)
-    return {
-      cast: [],
-      crew: [],
-    };
+	const searchRes = await searchTmdb(type, request);
+	if (searchRes.results.length === 0)
+		return {
+			cast: [],
+			crew: [],
+		};
 
-  const creditsRes = await getCreditsTmdb({
-    id: searchRes.results[0].id,
-    type: type as "movie" | "tv",
-  });
+	const creditsRes = await getCreditsTmdb({
+		id: searchRes.results[0].id,
+		type: type as "movie" | "tv",
+	});
 
-  return mapDramaCredits(creditsRes);
+	return mapDramaCredits(creditsRes);
 }

@@ -73,7 +73,7 @@ export default function DramaEpisodeList({
                   isChannelIdMatch(Number(channel_id), episode.id, index) &&
                     "bg-primary text-white",
                 )}
-                key={episode.id}
+                key={`${episode.id}-${episode.category_id}`}
                 href={`/dramas/${episode.category_id}?channel_id=${episode.id}`}
               >
                 <span>

@@ -21,11 +21,11 @@ import {
 } from "@/features/drama/server/service";
 import { formatViews } from "@/features/drama/utils";
 import { DramaCategoryTypeEnum } from "@/features/drama/types";
-import { VideoPlayer } from "@/features/video-player/components/VideoPlayer";
+import VideoPlayer from "@/features/video-player/components/VideoPlayer";
 
 interface MovieDetailsProps {
   id: string;
-  channel_id?: string | string[];
+  channel_id?: string;
 }
 
 export default async function DramaDetails({
@@ -59,12 +59,15 @@ export default async function DramaDetails({
   return (
     <main className="container mx-auto p-4 sm:p-5 space-y-8">
       <VideoPlayer
-        src={video}
+        id={currentEpisode.id}
+        category_id={currentEpisode.category_id}
+        video={video}
         title={currentEpisode.title}
         poster={currentEpisode.poster}
         isHdAvailable={isHdAvailable}
         prevEpisode={prevEpisode}
         nextEpisode={nextEpisode}
+        totalEpisodes={meta.totalItems}
       />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
@@ -144,10 +147,10 @@ export default async function DramaDetails({
                       />
                       <AvatarFallback>{actor.name.slice(0, 2)}</AvatarFallback>
                     </Avatar>
-                    <h3 className="font-medium text-sm break-words whitespace-normal">
+                    <h3 className="font-medium text-sm wrap-break-word whitespace-normal">
                       {actor.name}
                     </h3>
-                    <p className="text-xs text-muted-foreground truncate break-words whitespace-normal">
+                    <p className="text-xs text-muted-foreground truncate wrap-break-word whitespace-normal">
                       {actor.character}
                     </p>
                   </div>
@@ -175,10 +178,10 @@ export default async function DramaDetails({
                       />
                       <AvatarFallback>{actor.name.slice(0, 2)}</AvatarFallback>
                     </Avatar>
-                    <h3 className="font-medium text-sm break-words whitespace-normal">
+                    <h3 className="font-medium text-sm wrap-break-word whitespace-normal">
                       {actor.name}
                     </h3>
-                    <p className="text-xs text-muted-foreground truncate break-words whitespace-normal">
+                    <p className="text-xs text-muted-foreground truncate wrap-break-word whitespace-normal">
                       {actor.job}
                     </p>
                   </div>

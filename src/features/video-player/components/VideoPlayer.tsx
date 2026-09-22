@@ -1,259 +1,206 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { cn } from "@/lib/utils";
-import { formatVideoTime } from "../utils";
-import type { VideoPlayerProps } from "../types";
-import { PlayerControls } from "./PlayerControls";
-import { useVideoPlayer } from "../hooks/useVideoPlayer";
-import { useHls } from "../hooks/useHls";
-import { useBuffering } from "../hooks/useBuffering";
+import "@vidstack/react/player/styles/base.css";
+import "@vidstack/react/player/styles/plyr/theme.css";
+
 import {
-  Loader2,
-  MinusIcon,
-  PlusIcon,
-  Volume1Icon,
-  Volume2Icon,
-  VolumeXIcon,
-} from "lucide-react";
-import { FeedbackOverlay } from "./FeedbackOverlay";
-import { useTransientState } from "../hooks/useTransientState";
-import { useFullscreen } from "../hooks/useFullscreen";
-import { useAutoHideControls } from "../hooks/useAutoHideControls";
-import { useVideoSource } from "../hooks/useVideoSource";
-import { useDoubleTapSeek } from "../hooks/useDoubleTapSeek";
+  MediaPlayer,
+  type MediaPlayerInstance,
+  MediaProvider,
+  Poster,
+  Menu,
+  ChapterTitle,
+} from "@vidstack/react";
+import {
+  PlyrLayout,
+  plyrLayoutIcons,
+} from "@vidstack/react/player/layouts/plyr";
 
-export function VideoPlayer({
-  src,
-  title = "Untitled",
-  isHdAvailable,
+import { type ContinueWatch, type VideoPlayerProps, Quality } from "../types";
+import { useRef, useState } from "react";
+import { useContinueWatching } from "../hooks/useContinueWatching";
+import { ContinueWatchingPrompt } from "./ContinueWatchPrompt";
+import { getVideoMimeType } from "../utils";
+import { CheckIcon } from "lucide-react";
+
+export default function VideoPlayer({
+  id,
+  category_id,
   poster,
-  className,
-  prevEpisode,
-  nextEpisode,
+  video,
+  title,
+  isHdAvailable,
+  totalEpisodes,
 }: VideoPlayerProps) {
-  const [seekDelta, setSeekDelta] = useState<number | null>(null);
+  const [quality, setQuality] = useState<Quality>(() =>
+    isHdAvailable ? Quality.HD : Quality.SD,
+  );
+  const [error, setError] = useState(false);
+  const [resumePrompt, setResumePrompt] = useState<ContinueWatch | null>(null);
+  const playerRef = useRef<MediaPlayerInstance>(null);
+  const hasCheckedResume = useRef(false);
+  const qualitySwitchRef = useRef<{
+    time: number;
+    playing: boolean;
+  } | null>(null);
+  const currentSrc = video?.[quality];
 
-  const containerRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  const handleSeekDelta = (delta: number, moved: number) =>
-    setSeekDelta((prev) => {
-      if (prev === null) return delta;
-      const sameDirection = (prev > 0 && delta > 0) || (prev < 0 && delta < 0);
-      if (moved === 0 || !sameDirection) return delta;
-      return prev + delta;
-    });
-
-  const { switchQuality, currentSrc, quality, isSourceLoading } =
-    useVideoSource({
-      videoRef,
-      sources: src,
-      isHdAvailable,
-    });
-
-  useHls({
-    videoRef,
-    src: {
-      url: currentSrc,
-      isHls: src?.isHls,
-    },
+  const { save, getResumePosition, complete } = useContinueWatching({
+    id,
+    category_id,
+    totalEpisodes,
+    title,
+    poster,
   });
+  const [initialResume] = useState(() => getResumePosition());
 
-  const { isFullscreen, toggleFullscreen } = useFullscreen({
-    containerRef,
-    videoRef,
-  });
-  const { state, actions } = useVideoPlayer(videoRef, toggleFullscreen);
-  const { handleDoubleTap } = useDoubleTapSeek({
-    containerRef,
-    onSeek: (delta) => {
-      const moved = actions.seekBy(delta);
-      handleSeekDelta(delta, moved);
-    },
-  });
-  const {
-    visible: controlsVisible,
-    showControls,
-    hideControls,
-    startInteracting,
-    stopInteracting,
-  } = useAutoHideControls({
-    isPlaying: state.isPlaying,
-  });
-  const isBuffering = useBuffering(videoRef);
-  const showBuffer = isBuffering || state.isSeeking || isSourceLoading;
+  const switchQuality = (nextQuality: Quality) => {
+    if (nextQuality === quality) return;
 
-  // UI feedback based on user interaction
-  const volumeFeedback = useTransientState({
-    value: state.volume[0],
-  });
-  const VolumeFeedbackIcon = state.isMuted
-    ? VolumeXIcon
-    : state.volume[0] < 50
-      ? Volume1Icon
-      : Volume2Icon;
+    const player = playerRef.current;
 
-  const seekFeedback = useTransientState({
-    value: seekDelta,
-  });
-
-  useEffect(() => {
-    if (seekFeedback === null) {
-      setSeekDelta(null);
-    }
-  }, [seekFeedback]);
-
-  const isMobile =
-    typeof window !== "undefined" &&
-    /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-  const handleContainerTap = (e: React.PointerEvent) => {
-    const target = e.target as HTMLDivElement;
-
-    // ignore controls interaction
-    if (target.closest("[data-player-controls]")) return;
-
-    // 📱 Mobile behavior
-    if (e.pointerType === "touch") {
-      if (controlsVisible) hideControls();
-      else showControls();
-      return;
+    if (player) {
+      qualitySwitchRef.current = {
+        time: player.currentTime,
+        playing: !player.paused,
+      };
     }
 
-    if (e.pointerType === "mouse") {
-      if (e.button !== 0) return; // only left click
-      // 🖥 Desktop behavior
-      actions.togglePlay();
-      showControls();
+    setQuality(nextQuality);
+  };
+
+  const onPlay = () => {
+    if (hasCheckedResume.current) return;
+    hasCheckedResume.current = true;
+
+    const player = playerRef.current;
+    const saved = initialResume;
+
+    if (!player || !saved) return;
+    if (saved.position < 30) return;
+
+    if (saved.duration > 0 && saved.position / saved.duration >= 0.95) return;
+
+    player.pause();
+    setResumePrompt(saved);
+  };
+
+  const onCanPlay = async () => {
+    const resume = qualitySwitchRef.current;
+    const player = playerRef.current;
+
+    if (!player || !resume) return;
+
+    player.currentTime = resume.time;
+    qualitySwitchRef.current = null;
+
+    if (resume.playing) {
+      try {
+        await player.play();
+      } catch (error) {
+        console.error("Failed to resume video:", error);
+      }
     }
   };
 
-  return (
-    <section
-      className={cn(
-        "overflow-hidden rounded-2xl border bg-background shadow-sm",
-        className,
-      )}
-    >
-      <div
-        ref={containerRef}
-        tabIndex={0}
-        onPointerDown={(e) => {
-          handleContainerTap(e);
-          handleDoubleTap(e);
-        }}
-        onMouseMove={!isMobile ? showControls : undefined}
-        onKeyDown={(e) => {
-          if (e.key === "ArrowRight") {
-            e.preventDefault();
-            const moved = actions.seekBy(5);
-            handleSeekDelta(5, moved);
-            return;
-          }
+  const onTimeUpdate = () => {
+    if (!playerRef.current) return;
+    save(playerRef.current.currentTime, playerRef.current.duration);
+  };
 
-          if (e.key === "ArrowLeft") {
-            e.preventDefault();
-            const moved = actions.seekBy(-5);
-            handleSeekDelta(-5, moved);
-            return;
-          }
+  //Continue prompt
+  const onContinue = () => {
+    const player = playerRef.current;
+    if (!resumePrompt || !player) return;
 
-          actions.handleKeyDown(e); // fallback to core logic
-        }}
-        onDoubleClick={() => {
-          if (isMobile) return;
-          toggleFullscreen();
-        }}
-        className="relative w-full h-[45dvh] sm:h-auto sm:aspect-video bg-black outline-none focus:ring-2 focus:ring-primary touch-manipulation"
-      >
-        <FeedbackOverlay visible={showBuffer}>
-          <Loader2 className="size-10 animate-spin text-white" />
-        </FeedbackOverlay>
-        <div
-          className={cn(
-            "absolute top-1/2 -translate-y-1/2 left-16 flex items-center justify-center gap-1 transition-transform scale-0 text-white",
-            { "scale-100": seekFeedback !== null && seekFeedback < 0 },
-          )}
-        >
-          <MinusIcon className="size-4 sm:size-6" strokeWidth={3} />
-          <p className="text-white text-sm sm:text-lg tabular-nums">
-            {Math.abs(seekFeedback || 0)}s
-          </p>
-        </div>
-        <FeedbackOverlay visible={volumeFeedback !== null} backdrop={false}>
-          <div className="px-3 py-2 bg-neutral-800/40 backdrop-blur rounded flex flex-col items-center justify-center gap-2 size-20 sm:size-40">
-            <VolumeFeedbackIcon className="size-4" />
-            <p className="text-white text-sm tabular-nums">{volumeFeedback}%</p>
-          </div>
-        </FeedbackOverlay>
-        <div
-          className={cn(
-            "absolute top-1/2 -translate-y-1/2 right-16 flex items-center justify-center gap-1 transition-transform scale-0 text-white",
-            { "scale-100": seekFeedback !== null && seekFeedback > 0 },
-          )}
-        >
-          <PlusIcon className="size-4 sm:size-6" strokeWidth={3} />
-          <p className="text-white text-sm  sm:text-lg tabular-nums">
-            {Math.abs(seekFeedback || 0)}s
-          </p>
-        </div>
-        <video
-          ref={videoRef}
-          className={"size-full object-contain"}
-          poster={poster}
-          controls={false}
-          playsInline
-          webkit-playsinline="true"
-        />
-        <div
-          className={cn(
-            "pointer-events-none absolute inset-0 bg-gradient-to-b from-neutral-800/80 via-neutral-800/10 transition-opacity to-transparent opacity-0",
-            {
-              "opacity-100": controlsVisible,
-            },
-          )}
-        >
-          <h3 className="truncate uppercase font-bold text-xs xs:text-base absolute top-10 left-10 text-white">
-            {title}
-          </h3>
-        </div>
-        <div
-          data-player-controls
-          className={cn(
-            "absolute inset-x-0 bottom-0 translate-y-full xs:p-4 transition-transform duration-300 pointer-events-auto",
-            {
-              "translate-y-0": controlsVisible,
-            },
-          )}
-        >
-          <PlayerControls
-            portalContainer={containerRef.current ?? undefined}
-            prevEpisode={prevEpisode}
-            nextEpisode={nextEpisode}
-            quality={quality}
-            isPlaying={state.isPlaying}
-            isHdAvailable={isHdAvailable}
-            isFullscreen={isFullscreen}
-            isMuted={state.isMuted}
-            currentTimeLabel={formatVideoTime(
-              (state.progress / 100) * state.duration,
-            )}
-            durationLabel={formatVideoTime(state.duration)}
-            progress={state.progress}
-            buffered={state.buffered}
-            volume={state.volume}
-            onPlayToggle={actions.togglePlay}
-            onSeekChange={actions.handleSeek}
-            onVolumeChange={actions.handleVolume}
-            onMuteToggle={actions.toggleMute}
-            onFullscreenToggle={toggleFullscreen}
-            onQualityChange={switchQuality}
-            onInteractStart={startInteracting}
-            onInteractEnd={stopInteracting}
-          />
-        </div>
+    player.currentTime = resumePrompt.position;
+    setResumePrompt(null);
+    player.play();
+  };
+
+  const onRestart = () => {
+    const player = playerRef.current;
+    if (!player) return;
+    complete();
+    player.currentTime = 0;
+    setResumePrompt(null);
+    player.play();
+  };
+
+  if (error)
+    return (
+      <div className="aspect-video bg-black rounded-2xl">
+        "implement error UI handling later"
       </div>
-    </section>
+    );
+
+  return (
+    <>
+      <ContinueWatchingPrompt
+        open={resumePrompt !== null}
+        onContinue={onContinue}
+        onRestart={onRestart}
+        position={resumePrompt?.position}
+      />
+      <MediaPlayer
+        volume={0.5}
+        aspectRatio="16/9"
+        ref={playerRef}
+        title={title}
+        src={{
+          src: `/api/video/${currentSrc}`,
+          type: getVideoMimeType(video?.isHls ?? false),
+        }}
+        onTimeUpdate={onTimeUpdate}
+        onCanPlay={onCanPlay}
+        onPlay={onPlay}
+        onError={(detail) => {
+          console.log(detail);
+          setError(true);
+        }}
+      >
+        <MediaProvider>
+          <Poster className="vds-poster" src={poster} alt={title} />
+        </MediaProvider>
+        <ChapterTitle className="media-chapter-title" defaultText="test" />
+        <PlyrLayout
+          thumbnails={poster}
+          icons={plyrLayoutIcons}
+          slots={{
+            settingsMenu: (
+              <Menu.Root>
+                <Menu.Button>Quality</Menu.Button>
+                <Menu.Content>
+                  <Menu.RadioGroup value={quality}>
+                    <Menu.Radio
+                      className="flex items-center gap-2"
+                      value={Quality.SD}
+                      onSelect={() => switchQuality(Quality.SD)}
+                    >
+                      SD
+                      {quality === Quality.SD && (
+                        <CheckIcon className="size-4" />
+                      )}
+                    </Menu.Radio>
+                    {isHdAvailable && (
+                      <Menu.Radio
+                        className="flex items-center gap-2"
+                        value={Quality.HD}
+                        onSelect={() => switchQuality(Quality.HD)}
+                      >
+                        HD
+                        {quality === Quality.HD && (
+                          <CheckIcon className="size-4" />
+                        )}
+                      </Menu.Radio>
+                    )}
+                  </Menu.RadioGroup>
+                </Menu.Content>
+              </Menu.Root>
+            ),
+          }}
+        />
+      </MediaPlayer>
+    </>
   );
 }
