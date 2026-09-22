@@ -9,7 +9,7 @@ import type { DramaListResult } from "../types";
 import DramaCard from "./DramaCard";
 
 interface DramaListProps {
-  setApi: Dispatch<SetStateAction<CarouselApi>>;
+  setApi?: Dispatch<SetStateAction<CarouselApi>>;
   data: DramaListResult;
   variant: "grid" | "carousel";
 }
